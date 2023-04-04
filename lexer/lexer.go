@@ -19,6 +19,13 @@ func main() {
 
 	fmt.Println(stoken.Text)
 	fmt.Println(stoken.Type)
+
+	code = ">"
+	ans = toknize(code)
+	fmt.Println(ans)
+
+	fmt.Println(stoken.Text)
+	fmt.Println(stoken.Type)
 }
 
 var stoken SimpleToken
@@ -33,6 +40,12 @@ func toknize(code string) dfastate.State {
 		
 		case dfastate.Plus:
 			state = initToken(byte(ch))
+
+		case dfastate.GT:
+			state = initToken(byte(ch))
+		
+		case dfastate.Assign:
+			state = initToken(byte(ch)) 
 		}
 
 		//需要将最后一个东西送进去
@@ -47,6 +60,8 @@ func toknize(code string) dfastate.State {
 func initToken(ch byte) dfastate.State {
 	if len(tokenText) > 0 {
 		stoken.Text = tokenText
+
+		tokenText = ""
 	}
 
 	var state dfastate.State = dfastate.Init
@@ -58,6 +73,10 @@ func initToken(ch byte) dfastate.State {
 		stoken.Type = token.PLUS
 		state = dfastate.Plus
 		tokenText += string(ch)
+	} else if ch == '>' {
+		stoken.Type = token.GT
+		state = dfastate.GT
+		tokenText += string(ch)
 	}
 
 	return state
@@ -65,4 +84,12 @@ func initToken(ch byte) dfastate.State {
 
 func isDigit(ch byte) bool {
 	return ch >= '0' && ch <= '9'
+}
+
+func isAlpha(ch byte) bool {
+	return ch >= 'a' && ch <= 'z'
+}
+
+func isBlank(ch byte) bool {
+	return ch == ' ' || ch == '\t' || ch == '\n'
 }
