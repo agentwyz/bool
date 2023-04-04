@@ -14,14 +14,21 @@ type SimpleToken struct {
 
 func main() {
 	var code = "+"
-	var ans  dfastate.State = toknize(code)
+	var ans  dfastate.State = tokenize(code)
 	fmt.Println(ans)
 
 	fmt.Println(stoken.Text)
 	fmt.Println(stoken.Type)
 
 	code = ">"
-	ans = toknize(code)
+	ans = tokenize(code)
+	fmt.Println(ans)
+
+	fmt.Println(stoken.Text)
+	fmt.Println(stoken.Type)
+
+	code = ">="
+	ans = tokenize(code)
 	fmt.Println(ans)
 
 	fmt.Println(stoken.Text)
@@ -31,7 +38,7 @@ func main() {
 var stoken SimpleToken
 var tokenText string
 
-func toknize(code string) dfastate.State {
+func tokenize(code string) dfastate.State {
 	var state dfastate.State = dfastate.Init
 	for _, ch := range code {
 		switch state {
@@ -42,8 +49,15 @@ func toknize(code string) dfastate.State {
 			state = initToken(byte(ch))
 
 		case dfastate.GT:
+			if ch == '=' {
+				tokenText += string(ch)
+				stoken.Type = token.GE
+				state = dfastate.GE
+			} else {
+				state = initToken(byte(ch))
+			}
+		case dfastate.GE:
 			state = initToken(byte(ch))
-		
 		case dfastate.Assign:
 			state = initToken(byte(ch)) 
 		}
