@@ -6,48 +6,74 @@ import (
 	"yang/dfastate"
 )
 
+type Token interface {
+	getType() token.Type
+	getText() string
+}
+
 
 type SimpleToken struct {
 	Text string
 	Type token.Type
 }
 
+func (stk SimpleToken) getText() string {
+	return stk.Text
+}
+
+func (stk SimpleToken) getType() token.Type {
+	return stk.Type
+}
+
 func main() {
-	var code = "+"
-	var ans  dfastate.State = tokenize(code)
-	fmt.Println(ans)
+	var code string = "+>>"
+	var ans dfastate.State = tokenize(code)
+	 _ = ans
+	// code = ">"
+	// ans = tokenize(code)
 
-	fmt.Println(stoken.Text)
-	fmt.Println(stoken.Type)
+	// code = ">="
+	// ans = tokenize(code)
+	
+	// code = "+"
+	// fmt.Print("==========\n")
+	//ans = tokenize(code)
+	//fmt.Println(ans)
 
-	code = ">"
+	for i, j := range tokens {
+		fmt.Print(i)
+		fmt.Print("\t\t")
+		fmt.Println(j)
+	}
+	
+
+	code = "+>+"
 	ans = tokenize(code)
-	fmt.Println(ans)
-
-	fmt.Println(stoken.Text)
-	fmt.Println(stoken.Type)
-
-	code = ">="
-	ans = tokenize(code)
-	fmt.Println(ans)
-
-	fmt.Println(stoken.Text)
-	fmt.Println(stoken.Type)
+	for i, j := range tokens {
+		fmt.Print(i)
+		fmt.Print("\t\t")
+		fmt.Println(j)
+	}
 }
 
 var stoken SimpleToken
 var tokenText string
+var tokens []Token
+
 
 func tokenize(code string) dfastate.State {
 	var state dfastate.State = dfastate.Init
-	for _, ch := range code {
+	tokenText = ""
+	stoken = SimpleToken{}
+	var ch rune
+	for _, ch = range code {
 		switch state {
 		case dfastate.Init:
 			state = initToken(byte(ch))
-		
+			
 		case dfastate.Plus:
 			state = initToken(byte(ch))
-
+			
 		case dfastate.GT:
 			if ch == '=' {
 				tokenText += string(ch)
@@ -59,23 +85,30 @@ func tokenize(code string) dfastate.State {
 		case dfastate.GE:
 			state = initToken(byte(ch))
 		case dfastate.Assign:
-			state = initToken(byte(ch)) 
+			state = initToken(byte(ch))
+		case dfastate.EQ:
+			state = initToken(byte(ch))
+		default:
 		}
+	}
 
-		//需要将最后一个东西送进去
-		if len(tokenText) > 0 {
-			initToken(byte(ch))
-		}
+	//这个地方需要非常的小心
+	if len(tokenText) > 0 {
+		initToken(byte(ch))
 	}
 
 	return state
 }
 
+
 func initToken(ch byte) dfastate.State {
 	if len(tokenText) > 0 {
+		
 		stoken.Text = tokenText
-
+		
+		tokens = append(tokens, stoken)
 		tokenText = ""
+		stoken = SimpleToken{}
 	}
 
 	var state dfastate.State = dfastate.Init
