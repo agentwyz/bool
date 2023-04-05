@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"yang/token"
 	"yang/dfastate"
+	"yang/token"
 )
 
 type Token interface {
 	getType() token.Type
 	getText() string
 }
-
 
 type SimpleToken struct {
 	Text string
@@ -28,26 +27,36 @@ func (stk SimpleToken) getType() token.Type {
 func main() {
 	var code string = "+>>"
 	var ans dfastate.State = tokenize(code)
-	 _ = ans
-	// code = ">"
-	// ans = tokenize(code)
+	_ = ans
+	code = ">"
+	ans = tokenize(code)
 
-	// code = ">="
-	// ans = tokenize(code)
-	
-	// code = "+"
-	// fmt.Print("==========\n")
-	//ans = tokenize(code)
-	//fmt.Println(ans)
+	code = ">="
+	ans = tokenize(code)
+
+	code = "+"
+	fmt.Print("==========\n")
+	ans = tokenize(code)
+	fmt.Println(ans)
 
 	for i, j := range tokens {
 		fmt.Print(i)
 		fmt.Print("\t\t")
 		fmt.Println(j)
 	}
-	
 
 	code = "+>+"
+	ans = tokenize(code)
+	for i, j := range tokens {
+		fmt.Print(i)
+		fmt.Print("\t\t")
+		fmt.Println(j)
+	}
+	fmt.Println("============================")
+
+	//重新更新
+	tokens = []Token{}
+	code = "int"
 	ans = tokenize(code)
 	for i, j := range tokens {
 		fmt.Print(i)
@@ -60,7 +69,6 @@ var stoken SimpleToken
 var tokenText string
 var tokens []Token
 
-
 func tokenize(code string) dfastate.State {
 	var state dfastate.State = dfastate.Init
 	tokenText = ""
@@ -70,10 +78,10 @@ func tokenize(code string) dfastate.State {
 		switch state {
 		case dfastate.Init:
 			state = initToken(byte(ch))
-			
+
 		case dfastate.Plus:
 			state = initToken(byte(ch))
-			
+
 		case dfastate.GT:
 			if ch == '=' {
 				tokenText += string(ch)
@@ -82,12 +90,23 @@ func tokenize(code string) dfastate.State {
 			} else {
 				state = initToken(byte(ch))
 			}
+
 		case dfastate.GE:
 			state = initToken(byte(ch))
+
 		case dfastate.Assign:
 			state = initToken(byte(ch))
+
 		case dfastate.EQ:
 			state = initToken(byte(ch))
+
+		case dfastate.Id:
+			if isAlpha(byte(ch)) {
+				tokenText += string(ch)
+			} else {
+				state = initToken(byte(ch))
+			}
+
 		default:
 		}
 	}
@@ -100,12 +119,11 @@ func tokenize(code string) dfastate.State {
 	return state
 }
 
-
 func initToken(ch byte) dfastate.State {
 	if len(tokenText) > 0 {
-		
+
 		stoken.Text = tokenText
-		
+
 		tokens = append(tokens, stoken)
 		tokenText = ""
 		stoken = SimpleToken{}
@@ -115,6 +133,10 @@ func initToken(ch byte) dfastate.State {
 	if isDigit(ch) {
 		stoken.Type = token.INT
 		state = dfastate.IntLiteral
+		tokenText += string(ch)
+	} else if isAlpha(ch) {
+		stoken.Type = token.IDENT
+		state = dfastate.Id
 		tokenText += string(ch)
 	} else if ch == '+' {
 		stoken.Type = token.PLUS
