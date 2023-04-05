@@ -6,21 +6,16 @@ import (
 	"yang/token"
 )
 
-type Token interface {
-	getType() token.Type
-	getText() string
-}
-
 type SimpleToken struct {
 	Text string
 	Type token.Type
 }
 
-func (stk SimpleToken) getText() string {
+func (stk SimpleToken) GetText() string {
 	return stk.Text
 }
 
-func (stk SimpleToken) getType() token.Type {
+func (stk SimpleToken) GetType() token.Type {
 	return stk.Type
 }
 
@@ -55,7 +50,7 @@ func main() {
 	fmt.Println("============================")
 
 	//重新更新
-	tokens = []Token{}
+	tokens = []token.Token{}
 	code = "int"
 	ans = tokenize(code)
 	for i, j := range tokens {
@@ -67,7 +62,7 @@ func main() {
 
 var stoken SimpleToken
 var tokenText string
-var tokens []Token
+var tokens []token.Token
 
 func tokenize(code string) dfastate.State {
 	var state dfastate.State = dfastate.Init
